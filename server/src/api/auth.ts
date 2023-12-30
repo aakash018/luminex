@@ -110,9 +110,12 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/refresh-token", async (req, res) => {
-  const cookie = req.cookies as { rid: string };
+  const cookie = req.cookies as { rid?: string };
 
   try {
+    if (!cookie.rid) {
+      throw "bad token";
+    }
     const isValid = jwt.verify(cookie.rid, process.env.REFRESH_TOKEN_SECRET);
     if (typeof isValid !== "string") {
       const user = await prisma.user.findUnique({

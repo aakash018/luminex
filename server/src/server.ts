@@ -21,7 +21,10 @@ app.use(express.json());
 app.use("/auth", auth);
 
 app.get("/", (_, res) => {
-  res.send("SERVER IS RUNNING");
+  res.json({
+    status: "ok",
+    message: "server running",
+  });
 });
 
 app.listen(PORT, () => {
