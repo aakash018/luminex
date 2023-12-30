@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Reader from "./pages/Reader";
 import "./App.css";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dash from "./pages/Dash";
+import axios from "axios";
+import { ResponseType } from "./types/global";
+import { setAccessToken } from "./accessToken";
 const router = createBrowserRouter([
   {
     path: "/",

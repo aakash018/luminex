@@ -11,6 +11,7 @@ specifiers:
   eslint: ^8.55.0
   eslint-plugin-react-hooks: ^4.6.0
   eslint-plugin-react-refresh: ^0.4.5
+  jwt-decode: ^4.0.0
   localforage: ^1.10.0
   match-sorter: ^6.3.1
   postcss: ^8.4.32
@@ -26,6 +27,7 @@ specifiers:
 
 dependencies:
   axios: 1.6.3
+  jwt-decode: 4.0.0
   localforage: 1.10.0
   match-sorter: 6.3.1
   react: 18.2.0
@@ -1669,6 +1671,11 @@ packages:
   /json-stable-stringify-without-jsonify/1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
     dev: true
+
+  /jwt-decode/4.0.0:
+    resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
+    engines: {node: '>=18'}
+    dev: false
 
   /keyv/4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
