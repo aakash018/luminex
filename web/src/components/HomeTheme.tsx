@@ -29,7 +29,7 @@ const HomeTheme: React.FC<Props> = ({ children }) => {
             }}
           />
         </div>
-        <div className="relative z-2">{children}</div>
+        <div className="relative z-2 w-[85%]">{children}</div>
       </div>
     </div>
   );

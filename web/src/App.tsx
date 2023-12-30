@@ -4,9 +4,14 @@ import Reader from "./pages/Reader";
 import "./App.css";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Dash from "./pages/Dash";
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Dash />,
+  },
+  {
+    path: "/login",
     element: <Login />,
   },
   {
