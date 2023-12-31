@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Input from "../components/shared/Input";
 import Button from "../components/shared/Button";
@@ -6,13 +6,18 @@ import HomeTheme from "../components/HomeTheme";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ResponseType, User } from "../types/global";
-import { setAccessToken } from "../accessToken";
+import { getAccessToken, setAccessToken } from "../accessToken";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setAccessToken("");
+    console.log(getAccessToken());
+  }, []);
 
   const handleSubmit = async () => {
     const payload = {
