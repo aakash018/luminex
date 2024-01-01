@@ -6,10 +6,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        "theme-dark-bg": "#011627",
+        "theme-dark-bg": "#000a12",
         "theme-dark-prm": "#F71735",
         "theme-light-bg": "#FDF7E4",
         "theme-light-prm": "#BBAB8C",
+        "theme-light-pop": "#b59557",
       },
       fontFamily: {
         lato: "Lato",

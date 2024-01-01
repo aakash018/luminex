@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import auth from "./api/auth";
+import { validateUser } from "./middleware/validateUser";
 
 const app = express();
 const PORT = 5000;
@@ -20,7 +21,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/auth", auth);
 
-app.get("/", (_, res) => {
+app.get("/", validateUser, (_, res) => {
   res.json({
     status: "ok",
     message: "server running",

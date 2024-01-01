@@ -5,6 +5,8 @@ import "./App.css";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dash from "./pages/Dash";
+import Add from "./pages/Add";
+import { UserProvider } from "./context/User";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,10 @@ const router = createBrowserRouter([
     element: <Signup />,
   },
   {
+    path: "/add",
+    element: <Add />,
+  },
+  {
     path: "/reader",
     element: <Reader />,
   },
@@ -27,9 +33,11 @@ const router = createBrowserRouter([
 
 const App: React.FC = () => {
   return (
-    <div className="w-[100vw] h-[100vh] overflow-hidden dark:bg-theme-dark-bg bg-theme-light-bg text-black dark:text-white">
-      <RouterProvider router={router} />
-    </div>
+    <UserProvider>
+      <div className="relative w-[100vw] h-[100%] dark:bg-theme-dark-bg bg-theme-light-bg text-black dark:text-white">
+        <RouterProvider router={router} />
+      </div>
+    </UserProvider>
   );
 };
 

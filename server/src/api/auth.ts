@@ -53,8 +53,6 @@ router.post("/signup", async (req, res) => {
       message: "error",
     });
   }
-
-  res.send("done");
 });
 
 router.post("/login", async (req, res) => {
