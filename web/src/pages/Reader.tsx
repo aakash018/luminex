@@ -53,11 +53,11 @@ function Reader() {
           }
         }}
       />
-      {pdfFile && (
+      {true && (
         <div className="w-full flex items-center justify-center overflow-hidden">
           {" "}
           <Document
-            file={pdfFile}
+            file="https://s3.tebi.io/luminex/mid_defense_proposal_3-2.pdf"
             onLoadSuccess={onDocumentLoadSuccess}
             options={options}
             className={"text!"}

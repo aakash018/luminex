@@ -144,4 +144,42 @@ router.get("/refresh-token", async (req, res) => {
   }
 });
 
+router.get("/refresh-token-with-user", async (req, res) => {
+  const cookie = req.cookies as { rid?: string };
+
+  try {
+    if (!cookie.rid) {
+      throw "bad token";
+    }
+    const isValid = jwt.verify(cookie.rid, process.env.REFRESH_TOKEN_SECRET);
+    if (typeof isValid !== "string") {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: isValid.userId,
+        },
+      });
+
+      if (user) {
+        const accessToken = createAccessToken(user);
+        const { password, ...userNew } = user;
+        res.json({
+          status: "ok",
+          message: "new token retrieved",
+          accessToken,
+          user: userNew,
+        });
+      } else {
+        throw "bad token";
+      }
+    } else {
+      throw "bad token";
+    }
+  } catch {
+    res.json({
+      status: "fail",
+      message: "bad refresh token",
+    });
+  }
+});
+
 export default router;

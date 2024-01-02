@@ -7,7 +7,7 @@ interface Props {
 const HomeTheme: React.FC<Props> = ({ children }) => {
   return (
     <div
-      className="w-full h-full lg:flex justify-center items-center
+      className="w-full h-[100vh] lg:flex justify-center items-center
      bg-theme-light-bg dark:bg-theme-dark-bg
       overflow-hidden "
     >

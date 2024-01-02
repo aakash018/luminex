@@ -7,10 +7,12 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ResponseType, User } from "../types/global";
 import { getAccessToken, setAccessToken } from "../accessToken";
+import { useUser } from "../context/User";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useUser();
 
   const navigate = useNavigate();
 
@@ -34,10 +36,11 @@ const Login: React.FC = () => {
         withCredentials: true,
       });
 
-      if (res.data.status === "fail") {
+      if (res.data.status === "fail" || !res.data.user) {
         return console.log(res.data);
       } else {
         setAccessToken(res.data.accessToken);
+        setUser(res.data.user);
         navigate("/");
       }
     } catch (e) {

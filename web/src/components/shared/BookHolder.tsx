@@ -16,7 +16,7 @@ const BookHolder: React.FC<Props> = ({ showInfo = "true" }) => {
             <div className="truncate text-sm mt-[-10px] ">
               William Shakespeare
             </div>
-            <ProgressBar progressPercentage={30} />
+            <ProgressBar progressPercentage={60} />
             <div className="text-sm">56/345</div>
           </div>
         </div>
