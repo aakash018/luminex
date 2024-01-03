@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Book" ALTER COLUMN "pagesRead" DROP NOT NULL,
+ALTER COLUMN "pagesRead" SET DEFAULT 0;

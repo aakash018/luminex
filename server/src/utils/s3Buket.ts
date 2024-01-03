@@ -6,8 +6,6 @@ import {
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import fs from "fs";
-
 const credentials = {
   accessKeyId: "QWftktT0VnFO0GCI",
   secretAccessKey: "15EFdoF8YyDvnw1ViEYw5qoTikzhFq4EqnwehUT8",
@@ -20,28 +18,30 @@ const s3Client = new S3Client({
 });
 
 // Function to get bucket location
-export async function uploadFileToS3(key: string) {
+export async function uploadFileToS3(key: string, body: any) {
   try {
     const uploadParams = {
       Bucket: "luminex", // Replace with your bucket name
       Key: key, // Specify the desired name for the file in the bucket
-      Body: fs.createReadStream("hello.txt"), // Read the local file for upload
+      Body: body, // Read the local file for upload
     };
 
     const command = new PutObjectCommand(uploadParams);
     const response = await s3Client.send(command);
-    console.log("File uploaded successfully:", response);
+
+    return response;
   } catch (err) {
     console.error("Error uploading file:", err);
+    return null;
   }
 }
 
-export async function getObjectUrl() {
+export async function getObjectUrl(key: string) {
   try {
     const get_command = new GetObjectCommand({
       Bucket: "luminex",
-      Key: "hello.txt",
-      ResponseContentDisposition: 'attachment; filename="hello.txt"',
+      Key: key,
+      ResponseContentDisposition: `attachment; filename=${key}`,
     });
 
     // Generate URL for the object

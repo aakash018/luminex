@@ -8,7 +8,7 @@ const Button: React.FC<Props> = ({ label, onClick }) => {
     <button
       onClick={onClick}
       className={
-        "dark:bg-theme-dark-prm bg-theme-light-prm dark:text-white text-black px-1 py-2 rounded-sm"
+        "dark:bg-theme-dark-prm bg-theme-light-prm dark:text-white text-black px-1 py-2 rounded-sm lg:text-sm"
       }
     >
       {label}

@@ -11,8 +11,8 @@ const HomeTheme: React.FC<Props> = ({ children }) => {
      bg-theme-light-bg dark:bg-theme-dark-bg
       overflow-hidden "
     >
-      <div className="lg:w-fit h-full lg:h-[800px] lg:flex lg:border-2 border-black dark:border-gray-500">
-        <div className="h-full w-[600px] hidden lg:block">
+      <div className="lg:w-fit h-full lg:h-[600px] lg:flex lg:border-2 border-black dark:border-gray-500">
+        <div className="h-full w-[550px] hidden lg:block">
           <img
             src={book}
             alt="book cover"
@@ -20,12 +20,12 @@ const HomeTheme: React.FC<Props> = ({ children }) => {
           />
         </div>
         <div
-          className="w-full h-full lg:w-[500px] 
+          className="w-full h-full lg:w-[400px] 
          text-black dark:text-white
           relative flex justify-center items-center flex-col"
         >
-          <div className="absolute top-0  w-full z-[0] lg:w-[502px] ">
-            <div className="w-full dark:bg-theme-dark-prm bg-theme-light-prm h-[70px]"></div>
+          <div className="absolute top-0  w-full z-[0]  ">
+            <div className="w-full dark:bg-theme-dark-prm bg-theme-light-prm h-[70px] lg:h-[10px]"></div>
             <Wave
               className="rotate-180"
               fill={`
@@ -45,7 +45,7 @@ const HomeTheme: React.FC<Props> = ({ children }) => {
               }}
             />
           </div>
-          <div className="relative z-2 w-[85%]">{children}</div>
+          <div className="relative z-2 w-[85%] lg:w-[75%]">{children}</div>
         </div>
       </div>
     </div>

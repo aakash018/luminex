@@ -21,9 +21,9 @@ model Book {
   name       String
   author     String
   totalPages Int
-  pagesRead  Int
-  cover      String
-  location   String
+  pagesRead  Int?   @default(0)
+  coverURL   String
+  bookURL    String
   user       User   @relation(fields: [userId], references: [id])
   userId     String
 }

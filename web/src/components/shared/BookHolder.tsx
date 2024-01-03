@@ -1,23 +1,55 @@
+import { useNavigate } from "react-router-dom";
 import ProgressBar from "./ProgressBar";
 
 interface Props {
   showInfo?: boolean;
 }
 
-const BookHolder: React.FC<Props> = ({ showInfo = "true" }) => {
+interface Props {
+  cover: string;
+  name: string;
+  author: string;
+  totalPages: number;
+  pagesRead: number;
+  id: string;
+}
+
+const BookHolder: React.FC<Props> = ({
+  showInfo = "true",
+  author,
+  cover,
+  name,
+  pagesRead,
+  totalPages,
+  id,
+}) => {
+  const nav = useNavigate();
+
+  const handleRoute = () => {
+    nav(`/reader/${id}`);
+  };
+
   return (
-    <div className='relative bg-[url("/dash/book-test-cover.jpg")] min-w-[170px] min-h-[250px] bg-cover bg-no-repeat bg-top'>
+    <div
+      style={{
+        background: `url(${cover})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+      onClick={handleRoute}
+      className="cursor-pointer relative min-w-[150px] min-h-[200px] lg:min-w-[200px] lg:min-h-[300px] "
+    >
       {showInfo && (
-        <div className="absolute bottom-0 h-2/3 bg-gradient-to-t from-[rgba(0,0,0,0.96)] from-20% via-[rgba(0,0,0,0.9)] via-60%  w-full">
-          <div className="mt-[47%] px-2 w-full flex flex-col gap-1 text-white">
-            <div className="truncate text-lg font-medium uppercase">
-              The book of art as da sd da asd
+        <div className="absolute bottom-0 h-2/3 bg-gradient-to-t from-[rgba(0,0,0,0.96)] from-20% via-[rgba(0,0,0,0.9)] via-60% lg:via-45%  w-full">
+          <div className="mt-[40%] lg:mt-[58%] px-2 w-full flex flex-col gap-1  text-white">
+            <div className="truncate text-base lg:text-lg font-medium uppercase ">
+              {name}
             </div>
-            <div className="truncate text-sm mt-[-10px] ">
-              William Shakespeare
-            </div>
+            <div className="truncate text-sm mt-[-10px] ">{author}</div>
             <ProgressBar progressPercentage={60} />
-            <div className="text-sm">56/345</div>
+            <div className="text-sm ">
+              {pagesRead}/{totalPages}
+            </div>
           </div>
         </div>
       )}

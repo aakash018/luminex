@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     element: <Add />,
   },
   {
-    path: "/reader",
+    path: "/reader/:bookId",
     element: <Reader />,
   },
 ]);
@@ -34,7 +34,7 @@ const router = createBrowserRouter([
 const App: React.FC = () => {
   return (
     <UserProvider>
-      <div className="relative w-[100vw] h-[100%] dark:bg-theme-dark-bg bg-theme-light-bg text-black dark:text-white">
+      <div className="relative w-[100vw] min-h-[100vh] h-[100%] dark:bg-theme-dark-bg bg-theme-light-bg text-black dark:text-white">
         <RouterProvider router={router} />
       </div>
     </UserProvider>

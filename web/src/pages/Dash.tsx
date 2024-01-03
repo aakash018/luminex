@@ -3,39 +3,73 @@ import BookHolder from "../components/shared/BookHolder";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
 import SearchBar from "../components/shared/SearchBar";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axiosInstance from "../axiosInstant";
+import { Book, ResponseType } from "../types/global";
 
 const Dash = () => {
   const nav = useNavigate();
+  const [books, setBooks] = useState<Book[]>([]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axiosInstance.get<ResponseType & { books?: Book[] }>(
+          "/book/get-1",
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (res.data.status === "ok" && res.data.books) {
+          setBooks(res.data.books);
+        }
+      } catch {
+        console.log("ERROR");
+      }
+    })();
+  }, []);
 
   return (
     <ProtectedRoutes>
-      <div className="p-5 flex gap-5 items-center">
-        <h1 className="font-sacramento text-3xl">luminex</h1>
-        <SearchBar />
+      <div className="lg:px-[150px] p-5 flex gap-5 items-center">
+        <h1 className="font-sacramento lg:text-3xl text-2xl">luminex</h1>
+        <div className="lg:m-auto">
+          <SearchBar />
+        </div>
       </div>
-      <div className="p-5 flex flex-col gap-10">
+      <div className="lg:px-[150px] p-5 flex flex-col gap-10 lg:mt-5">
         <div>
-          <div className="text-xl mb-2 font-semibold">Continue Reading</div>
-          <div className="flex gap-5 overflow-x-auto no-scrollbar">
-            <BookHolder />
-            <BookHolder />
-            <BookHolder />
+          <div className="text-md mb-2 font-semibold lg:mb-3">
+            Continue Reading
+          </div>
+          <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
+            {books.map((book) => (
+              <BookHolder
+                key={book.id}
+                id={book.id}
+                author={book.author}
+                cover={book.coverURL}
+                name={book.name}
+                pagesRead={book.pagesRead}
+                totalPages={book.totalPages}
+              />
+            ))}
           </div>
         </div>
         <div>
-          <div className="text-xl mb-2 font-semibold">Favourite</div>
+          <div className="text-md mb-2 font-semibold">Favourite</div>
           <div className="flex gap-5 overflow-x-auto no-scrollbar">
+            {/* <BookHolder showInfo={false} />
             <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} />
+            <BookHolder showInfo={false} /> */}
           </div>
         </div>
         <div>
-          <div className="text-xl mb-2 font-semibold">All Book</div>
+          <div className="text-md mb-2 font-semibold">All Book</div>
           <div className="flex gap-5 overflow-x-auto no-scrollbar">
+            {/* <BookHolder showInfo={false} />
             <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} />
+            <BookHolder showInfo={false} /> */}
           </div>
         </div>
         <div
