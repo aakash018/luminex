@@ -19,7 +19,3 @@
     scrollbar-width: none; /* Firefox */
   }
 }
-
-.dark span {
-  color: white !important;
-}

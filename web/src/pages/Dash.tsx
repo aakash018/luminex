@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../axiosInstant";
 import { Book, ResponseType } from "../types/global";
 
+import socket from "../socket";
+
 const Dash = () => {
   const nav = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
@@ -27,6 +29,17 @@ const Dash = () => {
         console.log("ERROR");
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    console.log("first");
+    socket.on("connect", () => {
+      console.log("Connected to server:", socket.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from server");
+    });
   }, []);
 
   return (
@@ -58,19 +71,11 @@ const Dash = () => {
         </div>
         <div>
           <div className="text-md mb-2 font-semibold">Favourite</div>
-          <div className="flex gap-5 overflow-x-auto no-scrollbar">
-            {/* <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} /> */}
-          </div>
+          <div className="flex gap-5 overflow-x-auto no-scrollbar"></div>
         </div>
         <div>
           <div className="text-md mb-2 font-semibold">All Book</div>
-          <div className="flex gap-5 overflow-x-auto no-scrollbar">
-            {/* <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} />
-            <BookHolder showInfo={false} /> */}
-          </div>
+          <div className="flex gap-5 overflow-x-auto no-scrollbar"></div>
         </div>
         <div
           onClick={() => {

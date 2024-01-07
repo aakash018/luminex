@@ -15,13 +15,7 @@ const Add = () => {
   const [numPages, setNumPages] = useState<number>();
 
   const handlelSubmit = async () => {
-    if (
-      !bookPdf ||
-      !cover ||
-      bookName.trim() === "" ||
-      author.trim() === "" ||
-      !numPages
-    ) {
+    if (!bookPdf || !cover || bookName.trim() === "" || author.trim() === "") {
       return;
     }
 
@@ -30,7 +24,7 @@ const Add = () => {
     formData.append("bookName", bookName);
     formData.append("author", author);
     formData.append("cover", cover);
-    formData.append("totalPages", numPages.toString());
+    formData.append("totalPages", "322");
 
     console.log(formData);
 

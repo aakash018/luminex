@@ -15,6 +15,7 @@ export interface Book {
   author: string;
   bookURL: string;
   coverURL: string;
+  location: string;
   id: string;
   name: string;
   pagesRead: number;

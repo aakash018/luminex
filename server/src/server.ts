@@ -6,6 +6,13 @@ import auth from "./api/auth";
 import { validateUser } from "./middleware/validateUser";
 import book from "./api/bookUpload";
 
+import http from "http";
+import { Server } from "socket.io";
+import {
+  getReadingLocations,
+  setReadingLocation,
+} from "./utils/userReadingLocation";
+
 const app = express();
 const PORT = 5000;
 
@@ -17,6 +24,40 @@ const corsOptions = {
   credentials: true,
 };
 
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_ENDPOINT,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("A client connected:", socket.id);
+
+  socket.on(
+    "cfiPosition",
+    (data: { userId: string; loc: string; bookId: string }) => {
+      setReadingLocation(socket.id, data.loc, data.userId, data.bookId);
+      console.log(getReadingLocations(socket.id));
+    }
+  );
+
+  socket.on("disconnect", async () => {
+    try {
+      await prisma.book.update({
+        where: {
+          id: getReadingLocations(socket.id).bookId,
+        },
+        data: {
+          location: getReadingLocations(socket.id).loc,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  });
+});
+
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -26,12 +67,13 @@ app.use("/auth", auth);
 app.use("/book", book);
 
 app.get("/", validateUser, (_, res) => {
+  console.log("SERVER RUNNING");
   res.json({
     status: "ok",
     message: "server running",
   });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("SERVER IS RUNNING AT", PORT);
 });

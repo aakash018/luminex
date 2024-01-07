@@ -11,7 +11,6 @@ router.post(
   uploadFileToMulter.fields([{ name: "book" }, { name: "cover" }]),
   async (req, res) => {
     const { bookName, author, totalPages } = req.body;
-    console.log(bookName, author);
 
     if (!req.decoded?.userId)
       return {
@@ -32,8 +31,12 @@ router.post(
       await uploadFileToS3(bookKey, book.buffer);
       await uploadFileToS3(coverKey, cover.buffer);
 
-      const bookURL = `https://s3.tebi.io/luminex/${bookKey}`;
-      const coverURL = `https://s3.tebi.io/luminex/${coverKey}`;
+      const bookURL = `https://s3.tebi.io/luminex/${encodeURIComponent(
+        bookKey
+      )}`;
+      const coverURL = `https://s3.tebi.io/luminex/${encodeURIComponent(
+        coverKey
+      )}`;
 
       await prisma.book.create({
         data: {
@@ -87,7 +90,7 @@ router.get("/get-1", validateUser, async (req, res) => {
   }
 });
 
-router.get("/getBookUrl", validateUser, async (req, res) => {
+router.get("/getBook", validateUser, async (req, res) => {
   const payload = req.query as { bookId: string };
 
   try {
@@ -101,7 +104,7 @@ router.get("/getBookUrl", validateUser, async (req, res) => {
       return res.json({
         status: "ok",
         message: "book url retried",
-        bookURL: book.bookURL,
+        book,
       });
     } else {
       return res.json({

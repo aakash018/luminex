@@ -1,56 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-import { Document, Page, pdfjs } from "react-pdf";
 import axiosInstance from "../axiosInstant";
 import { useParams } from "react-router-dom";
-import { ResponseType } from "../types/global";
+import { Book, ResponseType } from "../types/global";
+import "regenerator-runtime/runtime";
+// @ts-ignore
+// import pub from "../assets/The Vanishing Half -- Bennett, Brit -- 2020 -- Penguin Publishing Group -- 2955133ccf2213bb6a1406036c341952 -- Anna’s Archive.epub";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
-
-const options = {
-  standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts`,
-};
-
-const MAX_PDF_SIZE = 600;
+import { EpubViewer, ReactEpubViewer, ViewerRef } from "react-epub-viewer";
+import socket from "../socket";
+import { useUser } from "../context/User";
+import ProtectedRoutes from "../components/shared/ProtectedRoutes";
+// import { socket } from "./Dash";
 
 function Reader() {
-  const [numPages, setNumPages] = useState<number>();
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [windowWidth, setWindowHeight] = useState(
-    window.innerWidth <= MAX_PDF_SIZE ? window.innerWidth : MAX_PDF_SIZE
-  );
+  const { user } = useUser();
 
   let { bookId } = useParams();
-
+  const bookLoc = useRef<string>();
+  const [book, setBook] = useState<Book | null>(null);
   const [bookURL, setBookURL] = useState<string | null>(null);
-
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
-    setNumPages(numPages);
-  }
-
-  const handleResizePDF = () => {
-    if (window.innerWidth <= MAX_PDF_SIZE) {
-      setWindowHeight(window.innerWidth);
-    } else {
-      setWindowHeight(MAX_PDF_SIZE);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", handleResizePDF);
-
-    return () => {
-      window.removeEventListener("resize", handleResizePDF);
-    };
-  }, []);
+  const viewerRef = useRef<ViewerRef>(null);
 
   useEffect(() => {
     (async () => {
-      const res = await axiosInstance.get<ResponseType & { bookURL?: string }>(
-        "/book/getBookUrl",
+      const res = await axiosInstance.get<ResponseType & { book?: Book }>(
+        "/book/getBook",
         {
           withCredentials: true,
           params: {
@@ -59,43 +37,111 @@ function Reader() {
         }
       );
 
-      if (res.data.status === "ok" && res.data.bookURL) {
-        setBookURL(res.data.bookURL);
+      if (res.data.status === "ok" && res.data.book) {
+        setBook(res.data.book);
+        setBookURL(res.data.book.bookURL);
       } else {
         console.error(res.data.message);
       }
     })();
   }, []);
 
+  useEffect(() => {
+    const checkForElement = () => {
+      const targetElement = document.querySelectorAll("iframe");
+
+      if (targetElement.length !== 0) {
+        if (viewerRef.current && book?.location && book.location !== "") {
+          console.log(book.location);
+          viewerRef.current.setLocation(book?.location);
+        }
+      } else {
+        // If the element isn't found, set a timeout and keep checking
+        setTimeout(checkForElement, 1500); // Adjust the timeout as needed
+      }
+    };
+
+    checkForElement(); // Start the checking process initially
+
+    // Clean up the useEffect
+    return () => {
+      // If needed, perform cleanup here
+    };
+  }, [book]);
+
   return (
-    <div className="flex items-center justify-center w-full h-[100vh]  flex-col bg-white dark:bg-theme-dark-bg ">
-      {bookURL && (
-        <div className="w-full flex items-center justify-center overflow-hidden lg:overflow-auto">
-          {" "}
-          <Document
-            file={bookURL}
-            onLoadSuccess={onDocumentLoadSuccess}
-            options={options}
-          >
-            <Page
-              pageNumber={pageNumber}
-              className={"page"}
-              width={windowWidth}
-              // height={windowHeight}
-              canvasBackground={`${
-                document.documentElement.classList.contains("dark")
-                  ? "#000a12"
-                  : "white"
-              }`}
-              // canvasBackground="#000a12"
-            />
-          </Document>
-          <p>{/* Page {pageNumber} of {numPages} */}</p>{" "}
-          <button onClick={() => setPageNumber((prev) => prev + 1)}>+</button>
-          <button onClick={() => setPageNumber((prev) => prev - 1)}>-</button>
-        </div>
-      )}
-    </div>
+    <ProtectedRoutes>
+      <div className="flex items-center justify-center w-[100%] h-[100vh]  flex-col bg-white dark:bg-theme-dark-bg ">
+        {bookURL && (
+          <div className="w-full items-center justify-center overflow-hidden lg:overflow-auto">
+            {" "}
+            {bookURL && (
+              <div
+                style={{
+                  position: "relative",
+                  height: "100%",
+                }}
+              >
+                <ReactEpubViewer
+                  url={bookURL}
+                  viewerOption={{
+                    flow: "scrolled-doc",
+                    resizeOnOrientationChange: true,
+                    spread: "none",
+                  }}
+                  onPageChange={(e) => {
+                    console.log((e.currentPage / e.totalPage) * 100);
+                    const iframes = document.querySelectorAll("iframe");
+
+                    // Loop through each iframe
+                    iframes.forEach((iframe) => {
+                      // Access the contentDocument of the iframe
+                      const iframeDoc = iframe.contentDocument;
+
+                      // Check if the iframe has the srcdoc attribute
+                      if (iframe.getAttribute("srcdoc") && iframeDoc) {
+                        // Select all div elements inside the iframe
+                        const divsInsideIframe =
+                          iframeDoc.querySelectorAll("html");
+                        // const pTags = iframeDoc.querySelectorAll("p");
+
+                        // Change the font color of all selected divs to white
+                        divsInsideIframe.forEach((div) => {
+                          div.style.color = "white";
+                        });
+                      }
+                    });
+
+                    socket.emit("cfiPosition", {
+                      userId: user?.id,
+                      loc: viewerRef.current?.getCurrentCfi(),
+                      bookId,
+                    });
+                  }}
+                  ref={viewerRef as any}
+                />
+              </div>
+            )}
+            {/* {console.log(viewerRef.current)} */}
+            <p>{/* Page {pageNumber} of {numPages} */}</p>{" "}
+            <button
+              onClick={async () => {
+                if (viewerRef.current && book?.location) {
+                  console.log(viewerRef.current);
+                  // console.log(
+                  //   await viewerRef.current.setLocation(book?.location)
+                  //   // viewerRef.current.getCurrentCfi()
+                  // );
+                }
+              }}
+              className="w-20 h-20 bg-green-500 fixed bottom-0"
+            >
+              +
+            </button>
+          </div>
+        )}
+      </div>
+    </ProtectedRoutes>
   );
 }
 
