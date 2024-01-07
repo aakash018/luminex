@@ -9,9 +9,8 @@ interface Props {
   cover: string;
   name: string;
   author: string;
-  totalPages: number;
-  pagesRead: number;
   id: string;
+  progress: number;
 }
 
 const BookHolder: React.FC<Props> = ({
@@ -19,9 +18,9 @@ const BookHolder: React.FC<Props> = ({
   author,
   cover,
   name,
-  pagesRead,
-  totalPages,
+
   id,
+  progress,
 }) => {
   const nav = useNavigate();
 
@@ -46,10 +45,8 @@ const BookHolder: React.FC<Props> = ({
               {name}
             </div>
             <div className="truncate text-sm mt-[-10px] ">{author}</div>
-            <ProgressBar progressPercentage={60} />
-            <div className="text-sm ">
-              {pagesRead}/{totalPages}
-            </div>
+            <ProgressBar progressPercentage={progress} />
+            <div className="text-sm "></div>
           </div>
         </div>
       )}

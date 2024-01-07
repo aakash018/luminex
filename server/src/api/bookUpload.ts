@@ -10,7 +10,7 @@ router.post(
   validateUser,
   uploadFileToMulter.fields([{ name: "book" }, { name: "cover" }]),
   async (req, res) => {
-    const { bookName, author, totalPages } = req.body;
+    const { bookName, author } = req.body;
 
     if (!req.decoded?.userId)
       return {
@@ -44,7 +44,7 @@ router.post(
           name: bookName,
           bookURL,
           coverURL,
-          totalPages: parseInt(totalPages),
+
           user: {
             connect: {
               id: req.decoded.userId,
@@ -116,6 +116,35 @@ router.get("/getBook", validateUser, async (req, res) => {
     return res.json({
       status: "fail",
       message: "failed to retrieve book url",
+    });
+  }
+});
+
+router.post("/updateProgress", validateUser, async (req, res) => {
+  const payload = req.body as {
+    bookId: string;
+    location: string;
+    progress: number;
+  };
+  console.log("RUNNING", payload);
+  try {
+    await prisma.book.update({
+      where: {
+        id: payload.bookId,
+      },
+      data: {
+        location: payload.location,
+        progress: payload.progress,
+      },
+    });
+    res.json({
+      status: "ok",
+      message: "progress updated",
+    });
+  } catch (e) {
+    res.json({
+      status: "fail",
+      message: "failed to update progress",
     });
   }
 });

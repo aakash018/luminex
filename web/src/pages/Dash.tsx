@@ -63,8 +63,7 @@ const Dash = () => {
                 author={book.author}
                 cover={book.coverURL}
                 name={book.name}
-                pagesRead={book.pagesRead}
-                totalPages={book.totalPages}
+                progress={book.progress}
               />
             ))}
           </div>

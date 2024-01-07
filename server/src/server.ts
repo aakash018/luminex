@@ -36,8 +36,19 @@ io.on("connection", (socket) => {
 
   socket.on(
     "cfiPosition",
-    (data: { userId: string; loc: string; bookId: string }) => {
-      setReadingLocation(socket.id, data.loc, data.userId, data.bookId);
+    (data: {
+      userId: string;
+      loc: string;
+      bookId: string;
+      progress: number;
+    }) => {
+      setReadingLocation(
+        socket.id,
+        data.loc,
+        data.userId,
+        data.bookId,
+        data.progress
+      );
       console.log(getReadingLocations(socket.id));
     }
   );
@@ -50,6 +61,7 @@ io.on("connection", (socket) => {
         },
         data: {
           location: getReadingLocations(socket.id).loc,
+          progress: getReadingLocations(socket.id).progress,
         },
       });
     } catch (e) {

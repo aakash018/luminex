@@ -1,17 +1,24 @@
 const userReadingLocation: {
-  [key: string]: { userId: string; loc: string; bookId: string };
+  [key: string]: {
+    userId: string;
+    loc: string;
+    bookId: string;
+    progress: number;
+  };
 } = {};
 
 export const setReadingLocation = (
   socketID: string,
   epubLoc: string,
   userId: string,
-  bookId: string
+  bookId: string,
+  progress: number
 ) => {
   userReadingLocation[socketID] = {
     userId,
     loc: epubLoc,
     bookId,
+    progress,
   };
 };
 

@@ -14,13 +14,15 @@ import { EpubViewer, ReactEpubViewer, ViewerRef } from "react-epub-viewer";
 import socket from "../socket";
 import { useUser } from "../context/User";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
+
 // import { socket } from "./Dash";
 
 function Reader() {
+  const [pageData, setPageData] = useState<any>();
   const { user } = useUser();
 
   let { bookId } = useParams();
-  const bookLoc = useRef<string>();
+
   const [book, setBook] = useState<Book | null>(null);
   const [bookURL, setBookURL] = useState<string | null>(null);
   const viewerRef = useRef<ViewerRef>(null);
@@ -64,9 +66,6 @@ function Reader() {
     checkForElement(); // Start the checking process initially
 
     // Clean up the useEffect
-    return () => {
-      // If needed, perform cleanup here
-    };
   }, [book]);
 
   return (
@@ -90,7 +89,7 @@ function Reader() {
                     spread: "none",
                   }}
                   onPageChange={(e) => {
-                    console.log((e.currentPage / e.totalPage) * 100);
+                    // setPageData(e);
                     const iframes = document.querySelectorAll("iframe");
 
                     // Loop through each iframe
@@ -116,6 +115,7 @@ function Reader() {
                       userId: user?.id,
                       loc: viewerRef.current?.getCurrentCfi(),
                       bookId,
+                      progress: (e.currentPage / e.totalPage) * 100,
                     });
                   }}
                   ref={viewerRef as any}
@@ -124,20 +124,6 @@ function Reader() {
             )}
             {/* {console.log(viewerRef.current)} */}
             <p>{/* Page {pageNumber} of {numPages} */}</p>{" "}
-            <button
-              onClick={async () => {
-                if (viewerRef.current && book?.location) {
-                  console.log(viewerRef.current);
-                  // console.log(
-                  //   await viewerRef.current.setLocation(book?.location)
-                  //   // viewerRef.current.getCurrentCfi()
-                  // );
-                }
-              }}
-              className="w-20 h-20 bg-green-500 fixed bottom-0"
-            >
-              +
-            </button>
           </div>
         )}
       </div>

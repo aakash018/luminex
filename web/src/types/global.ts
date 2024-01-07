@@ -17,9 +17,8 @@ export interface Book {
   coverURL: string;
   location: string;
   id: string;
+  progress: number;
   name: string;
-  pagesRead: number;
-  totalPages: number;
   userId: string;
   user?: User;
 }

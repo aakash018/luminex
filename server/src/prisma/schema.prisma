@@ -17,14 +17,13 @@ model User {
 }
 
 model Book {
-  id         String  @id @default(cuid())
-  name       String
-  author     String
-  totalPages Int
-  pagesRead  Int?    @default(0)
-  location   String?
-  coverURL   String
-  bookURL    String
-  user       User    @relation(fields: [userId], references: [id])
-  userId     String
+  id       String  @id @default(cuid())
+  name     String
+  author   String
+  progress Int     @default(0)
+  location String?
+  coverURL String
+  bookURL  String
+  user     User    @relation(fields: [userId], references: [id])
+  userId   String
 }
