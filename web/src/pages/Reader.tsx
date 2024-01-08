@@ -14,11 +14,11 @@ import { EpubViewer, ReactEpubViewer, ViewerRef } from "react-epub-viewer";
 import socket from "../socket";
 import { useUser } from "../context/User";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
+import { setReadingLocation } from "../readingLocation";
 
 // import { socket } from "./Dash";
 
 function Reader() {
-  const [pageData, setPageData] = useState<any>();
   const { user } = useUser();
 
   let { bookId } = useParams();
@@ -110,20 +110,24 @@ function Reader() {
                         });
                       }
                     });
+                    const progress = (e.currentPage / e.totalPage) * 100;
+                    setReadingLocation(
+                      viewerRef.current!.getCurrentCfi(),
+                      bookId as string,
+                      progress
+                    );
 
                     socket.emit("cfiPosition", {
                       userId: user?.id,
                       loc: viewerRef.current?.getCurrentCfi(),
                       bookId,
-                      progress: (e.currentPage / e.totalPage) * 100,
+                      progress,
                     });
                   }}
                   ref={viewerRef as any}
                 />
               </div>
             )}
-            {/* {console.log(viewerRef.current)} */}
-            <p>{/* Page {pageNumber} of {numPages} */}</p>{" "}
           </div>
         )}
       </div>

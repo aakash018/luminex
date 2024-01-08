@@ -126,7 +126,7 @@ router.post("/updateProgress", validateUser, async (req, res) => {
     location: string;
     progress: number;
   };
-  console.log("RUNNING", payload);
+
   try {
     await prisma.book.update({
       where: {
