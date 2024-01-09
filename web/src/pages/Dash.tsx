@@ -1,4 +1,4 @@
-import { Plus } from "@phosphor-icons/react";
+import { Plus, X } from "@phosphor-icons/react";
 import BookHolder from "../components/shared/BookHolder";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
 import SearchBar from "../components/shared/SearchBar";
@@ -9,6 +9,7 @@ import { Book, ResponseType } from "../types/global";
 
 import socket from "../socket";
 import { clearReadingLocation, getReadingLocations } from "../readingLocation";
+import Settings from "../components/Settings";
 
 const Dash = () => {
   const nav = useNavigate();
@@ -71,15 +72,23 @@ const Dash = () => {
     });
   }, []);
 
+  const [show, setShow] = useState(false);
+
   return (
     <ProtectedRoutes>
+      <Settings show={show} />
       <div className="lg:px-[150px] px-5">
         <div className=" py-5 flex gap-5 items-center justify-between">
           <h1 className="font-sacramento lg:text-3xl text-2xl">luminex</h1>
           <div className="lg:m-auto">
             <SearchBar />
           </div>
-          <div className=" lg:w-[50px] lg:h-[50px] w-[30px] h-[30px] rounded-full bg-slate-500"></div>
+          <div
+            onClick={() => setShow((prev) => !prev)}
+            className="flex justify-center items-center relative lg:w-[50px] lg:h-[50px] w-[30px] h-[30px] rounded-full bg-slate-900 z-[100] cursor-pointer"
+          >
+            <X size={32} />
+          </div>
         </div>
         <div className="flex flex-col gap-10 lg:mt-5">
           <div>

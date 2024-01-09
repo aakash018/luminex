@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -15,16 +15,45 @@ import socket from "../socket";
 import { useUser } from "../context/User";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
 import { setReadingLocation } from "../readingLocation";
+import ReaderNav from "../components/ReaderNav";
+import ContentHolder, { Toc } from "../components/ContentHolder";
 
 // import { socket } from "./Dash";
+
+const fontThemeChange = () => {
+  const iframes = document.querySelectorAll("iframe");
+
+  // Loop through each iframe
+  iframes.forEach((iframe) => {
+    // Access the contentDocument of the iframe
+    const iframeDoc = iframe.contentDocument;
+
+    // Check if the iframe has the srcdoc attribute
+    if (iframe.getAttribute("srcdoc") && iframeDoc) {
+      // Select all div elements inside the iframe
+      const divsInsideIframe = iframeDoc.querySelectorAll("html");
+      // const pTags = iframeDoc.querySelectorAll("p");
+
+      // Change the font color of all selected divs to white
+      divsInsideIframe.forEach((div) => {
+        if (document.documentElement.classList.contains("dark")) {
+          div.style.color = "white";
+        } else {
+          div.style.color = "black";
+        }
+      });
+    }
+  });
+};
 
 function Reader() {
   const { user } = useUser();
 
   let { bookId } = useParams();
-
+  const [showContentMenu, setShowContentMenu] = useState(false);
   const [book, setBook] = useState<Book | null>(null);
   const [bookURL, setBookURL] = useState<string | null>(null);
+  const toc = useRef<Toc[]>([]);
   const viewerRef = useRef<ViewerRef>(null);
 
   useEffect(() => {
@@ -68,9 +97,67 @@ function Reader() {
     // Clean up the useEffect
   }, [book]);
 
+  const [showNav, setShowNav] = useState(false);
+
+  useEffect(() => {
+    if (showNav) {
+      setTimeout(() => {
+        setShowNav(false);
+      }, 3000);
+    }
+  }, [showNav]);
+
+  const reader = useMemo(
+    () => (
+      <ReactEpubViewer
+        url={bookURL as string}
+        viewerOption={{
+          flow: "scrolled-doc",
+          resizeOnOrientationChange: true,
+          spread: "none",
+        }}
+        onTocChange={(e) => {
+          toc.current = e;
+          // setRenderToc((prev) => !prev);
+        }}
+        onPageChange={(e) => {
+          // setPageData(e);
+          fontThemeChange();
+          const progress = (e.currentPage / e.totalPage) * 100;
+          setReadingLocation(
+            viewerRef.current!.getCurrentCfi(),
+            bookId as string,
+            progress
+          );
+
+          socket.emit("cfiPosition", {
+            userId: user?.id,
+            loc: viewerRef.current?.getCurrentCfi(),
+            bookId,
+            progress,
+          });
+        }}
+        ref={viewerRef as any}
+      />
+    ),
+    [bookURL]
+  );
+
   return (
     <ProtectedRoutes>
-      <div className="flex items-center justify-center w-[100%] h-[100vh]  flex-col bg-white dark:bg-theme-dark-bg ">
+      <ContentHolder
+        toc={toc.current}
+        setShow={setShowContentMenu}
+        show={showContentMenu}
+        viewerRef={viewerRef}
+      />
+      <div
+        className="absolute w-[150px] h-[150px]
+       bg-slate-400 z-[100] top-[50%] left-[50%] 
+       translate-x-[-50%] translate-y-[-50%] opacity-0"
+        onClick={() => setShowNav(true)}
+      ></div>
+      <div className="flex items-center justify-center w-[100%] h-[100vh]  flex-col bg-white dark:bg-theme-dark-bg transition-colors duration-500">
         {bookURL && (
           <div className="w-full items-center justify-center overflow-hidden lg:overflow-auto">
             {" "}
@@ -81,56 +168,17 @@ function Reader() {
                   height: "100%",
                 }}
               >
-                <ReactEpubViewer
-                  url={bookURL}
-                  viewerOption={{
-                    flow: "scrolled-doc",
-                    resizeOnOrientationChange: true,
-                    spread: "none",
-                  }}
-                  onPageChange={(e) => {
-                    // setPageData(e);
-                    const iframes = document.querySelectorAll("iframe");
-
-                    // Loop through each iframe
-                    iframes.forEach((iframe) => {
-                      // Access the contentDocument of the iframe
-                      const iframeDoc = iframe.contentDocument;
-
-                      // Check if the iframe has the srcdoc attribute
-                      if (iframe.getAttribute("srcdoc") && iframeDoc) {
-                        // Select all div elements inside the iframe
-                        const divsInsideIframe =
-                          iframeDoc.querySelectorAll("html");
-                        // const pTags = iframeDoc.querySelectorAll("p");
-
-                        // Change the font color of all selected divs to white
-                        divsInsideIframe.forEach((div) => {
-                          div.style.color = "white";
-                        });
-                      }
-                    });
-                    const progress = (e.currentPage / e.totalPage) * 100;
-                    setReadingLocation(
-                      viewerRef.current!.getCurrentCfi(),
-                      bookId as string,
-                      progress
-                    );
-
-                    socket.emit("cfiPosition", {
-                      userId: user?.id,
-                      loc: viewerRef.current?.getCurrentCfi(),
-                      bookId,
-                      progress,
-                    });
-                  }}
-                  ref={viewerRef as any}
-                />
+                {reader}
               </div>
             )}
           </div>
         )}
       </div>
+      <ReaderNav
+        themeSwitchCleanup={fontThemeChange}
+        setShowContent={setShowContentMenu}
+        showNav={showNav}
+      />
     </ProtectedRoutes>
   );
 }

@@ -19,3 +19,30 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+.clip-path {
+  clip-path: circle(0% at 100% 0);
+  transition: clip-path 1.2s ease-in-out;
+}
+
+.clip-path-active {
+  clip-path: circle(100% at 50% 30%);
+}
+
+.content-menu {
+  transform: translateX(100%);
+  transition: transform 0.5s ease-out;
+}
+
+.content-menu-active {
+  transform: translateX(0%);
+}
+
+.reader-nav {
+  transform: translateY(100%);
+  transition: transform 0.5s ease-out;
+}
+
+.reader-nav-active {
+  transform: translateY(0%);
+}
