@@ -40,13 +40,16 @@ const BookHolder: React.FC<Props> = ({
     >
       {showInfo && (
         <div className="absolute bottom-0 h-2/3 bg-gradient-to-t from-[rgba(0,0,0,0.96)] from-20% via-[rgba(0,0,0,0.9)] via-60% lg:via-45%  w-full">
-          <div className="mt-[40%] lg:mt-[58%] px-2 w-full flex flex-col gap-1  text-white">
-            <div className="truncate text-base lg:text-lg font-medium uppercase ">
-              {name}
+          <div className="mt-[40%] lg:mt-[58%] px-2 w-full flex flex-col gap-2  text-white">
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="truncate text-base lg:text-lg font-medium uppercase ">
+                  {name}
+                </div>
+                <div className="truncate text-sm mt-[-5px] ">{author}</div>
+              </div>
             </div>
-            <div className="truncate text-sm mt-[-10px] ">{author}</div>
             <ProgressBar progressPercentage={progress} />
-            <div className="text-sm "></div>
           </div>
         </div>
       )}

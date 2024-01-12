@@ -14,6 +14,7 @@ import Settings from "../components/Settings";
 const Dash = () => {
   const nav = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
+  const [favBooks, setFavBooks] = useState<Book[]>([]);
   useEffect(() => {
     (async () => {
       try {
@@ -38,6 +39,8 @@ const Dash = () => {
       const readingLoc = getReadingLocations();
 
       if (readingLoc.bookId.trim() !== "" || readingLoc.loc.trim() !== "") {
+        if (readingLoc.loc.split("/").length - 1 <= 4) return;
+
         try {
           const res = await axiosInstance.post<ResponseType>(
             "/book/updateProgress",
@@ -62,7 +65,6 @@ const Dash = () => {
   });
 
   useEffect(() => {
-    console.log("first");
     socket.on("connect", () => {
       console.log("Connected to server:", socket.id);
     });
@@ -70,6 +72,24 @@ const Dash = () => {
     socket.on("disconnect", () => {
       console.log("Disconnected from server");
     });
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axiosInstance.get<ResponseType & { books: Book[] }>(
+          "/book/getFavourites"
+        );
+
+        if (res.data.status === "ok") {
+          setFavBooks(res.data.books);
+        } else {
+          console.log(res.data.message);
+        }
+      } catch {
+        console.error("failed to connected to server");
+      }
+    })();
   }, []);
 
   const [show, setShow] = useState(false);
@@ -110,7 +130,18 @@ const Dash = () => {
           </div>
           <div>
             <div className="text-md mb-2 font-semibold">Favourite</div>
-            <div className="flex gap-5 overflow-x-auto no-scrollbar"></div>
+            <div className="flex gap-5 overflow-x-auto no-scrollbar">
+              {favBooks.map((book) => (
+                <BookHolder
+                  key={book.id}
+                  id={book.id}
+                  author={book.author}
+                  cover={book.coverURL}
+                  name={book.name}
+                  progress={book.progress}
+                />
+              ))}
+            </div>
           </div>
           <div>
             <div className="text-md mb-2 font-semibold">All Book</div>

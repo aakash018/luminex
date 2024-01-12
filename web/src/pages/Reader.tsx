@@ -14,7 +14,7 @@ import { EpubViewer, ReactEpubViewer, ViewerRef } from "react-epub-viewer";
 import socket from "../socket";
 import { useUser } from "../context/User";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
-import { setReadingLocation } from "../readingLocation";
+import { getReadingLocations, setReadingLocation } from "../readingLocation";
 import ReaderNav from "../components/ReaderNav";
 import ContentHolder, { Toc } from "../components/ContentHolder";
 
@@ -56,6 +56,9 @@ function Reader() {
   const toc = useRef<Toc[]>([]);
   const viewerRef = useRef<ViewerRef>(null);
 
+  const [bookLoading, setBookLoading] = useState(true);
+  const [isFavourite, setIsFavourite] = useState<boolean>(false);
+
   useEffect(() => {
     (async () => {
       const res = await axiosInstance.get<ResponseType & { book?: Book }>(
@@ -71,6 +74,7 @@ function Reader() {
       if (res.data.status === "ok" && res.data.book) {
         setBook(res.data.book);
         setBookURL(res.data.book.bookURL);
+        setIsFavourite(res.data.book.isFavourited);
       } else {
         console.error(res.data.message);
       }
@@ -79,12 +83,16 @@ function Reader() {
 
   useEffect(() => {
     const checkForElement = () => {
+      console.log("HERE");
       const targetElement = document.querySelectorAll("iframe");
 
       if (targetElement.length !== 0) {
         if (viewerRef.current && book?.location && book.location !== "") {
-          console.log(book.location);
+          console.log("LOCATION", book.location);
           viewerRef.current.setLocation(book?.location);
+          setReadingLocation(book.location, book.id, book.progress);
+          console.log(getReadingLocations());
+          setBookLoading(false);
         }
       } else {
         // If the element isn't found, set a timeout and keep checking
@@ -124,18 +132,21 @@ function Reader() {
           // setPageData(e);
           fontThemeChange();
           const progress = (e.currentPage / e.totalPage) * 100;
+          const loc = viewerRef.current?.getCurrentCfi();
           setReadingLocation(
             viewerRef.current!.getCurrentCfi(),
             bookId as string,
             progress
           );
 
-          socket.emit("cfiPosition", {
-            userId: user?.id,
-            loc: viewerRef.current?.getCurrentCfi(),
-            bookId,
-            progress,
-          });
+          if (loc !== "") {
+            socket.emit("cfiPosition", {
+              userId: user?.id,
+              loc: loc,
+              bookId,
+              progress,
+            });
+          }
         }}
         ref={viewerRef as any}
       />
@@ -178,6 +189,8 @@ function Reader() {
         themeSwitchCleanup={fontThemeChange}
         setShowContent={setShowContentMenu}
         showNav={showNav}
+        isFav={isFavourite}
+        setIsFav={setIsFavourite}
       />
     </ProtectedRoutes>
   );

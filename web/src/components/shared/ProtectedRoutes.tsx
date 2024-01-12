@@ -18,7 +18,6 @@ const ProtectedRoutes: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (!isTokenExpired(getAccessToken())) {
-      console.log(getAccessToken());
       return setLoading(false);
     }
 

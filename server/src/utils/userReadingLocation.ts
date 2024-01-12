@@ -23,6 +23,5 @@ export const setReadingLocation = (
 };
 
 export const getReadingLocations = (socketID: string) => {
-  console.log(userReadingLocation);
   return userReadingLocation[socketID];
 };

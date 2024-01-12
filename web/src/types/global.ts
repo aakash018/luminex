@@ -20,5 +20,6 @@ export interface Book {
   progress: number;
   name: string;
   userId: string;
+  isFavourited: boolean;
   user?: User;
 }

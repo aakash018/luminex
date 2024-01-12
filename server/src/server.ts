@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import auth from "./api/auth";
 import { validateUser } from "./middleware/validateUser";
-import book from "./api/bookUpload";
+import book from "./api/book";
 
 import http from "http";
 import { Server } from "socket.io";
@@ -49,12 +49,12 @@ io.on("connection", (socket) => {
         data.bookId,
         data.progress
       );
-      console.log(getReadingLocations(socket.id));
     }
   );
 
   socket.on("disconnect", async () => {
     try {
+      console.log(getReadingLocations(socket.id));
       await prisma.book.update({
         where: {
           id: getReadingLocations(socket.id).bookId,

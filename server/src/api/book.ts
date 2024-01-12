@@ -149,4 +149,79 @@ router.post("/updateProgress", validateUser, async (req, res) => {
   }
 });
 
+router.post("/addFavourite", validateUser, async (req, res) => {
+  const payload = req.body as { bookId: string };
+
+  const decodedToken = req.decoded;
+
+  try {
+    await prisma.book.update({
+      where: {
+        id: payload.bookId,
+        userId: decodedToken?.userId,
+      },
+      data: {
+        isFavourited: true,
+      },
+    });
+    res.json({
+      status: "ok",
+      message: "book added to favourite",
+    });
+  } catch {
+    res.json({
+      status: "fail",
+      message: "failed to find book",
+    });
+  }
+});
+
+router.post("/removeFavourite", validateUser, async (req, res) => {
+  const payload = req.body as { bookId: string };
+
+  const decodedToken = req.decoded;
+
+  try {
+    await prisma.book.update({
+      where: {
+        id: payload.bookId,
+        userId: decodedToken?.userId,
+      },
+      data: {
+        isFavourited: false,
+      },
+    });
+    res.json({
+      status: "ok",
+      message: "book added to favourite",
+    });
+  } catch {
+    res.json({
+      status: "fail",
+      message: "failed to find book",
+    });
+  }
+});
+
+router.get("/getFavourites", validateUser, async (req, res) => {
+  try {
+    const books = await prisma.book.findMany({
+      where: {
+        userId: req.decoded?.userId,
+        isFavourited: true,
+      },
+    });
+    res.json({
+      status: "ok",
+      message: "books found",
+      books,
+    });
+  } catch {
+    res.json({
+      status: "fail",
+      message: "failed to find favourite books",
+    });
+  }
+});
+
 export default router;
