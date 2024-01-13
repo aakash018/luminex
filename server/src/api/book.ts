@@ -67,7 +67,7 @@ router.post(
   }
 );
 
-router.get("/get-1", validateUser, async (req, res) => {
+router.get("/getBooksByUser", validateUser, async (req, res) => {
   const uid = req.decoded?.userId;
 
   try {

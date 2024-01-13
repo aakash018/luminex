@@ -49,7 +49,7 @@ const BookHolder: React.FC<Props> = ({
                 <div className="truncate text-sm mt-[-5px] ">{author}</div>
               </div>
             </div>
-            <ProgressBar progressPercentage={progress} />
+            {progress !== 0 && <ProgressBar progressPercentage={progress} />}
           </div>
         </div>
       )}

@@ -88,7 +88,6 @@ function Reader() {
 
       if (targetElement.length !== 0) {
         if (viewerRef.current && book?.location && book.location !== "") {
-          console.log("LOCATION", book.location);
           viewerRef.current.setLocation(book?.location);
           setReadingLocation(book.location, book.id, book.progress);
           console.log(getReadingLocations());

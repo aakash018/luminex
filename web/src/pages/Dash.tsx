@@ -15,11 +15,12 @@ const Dash = () => {
   const nav = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [favBooks, setFavBooks] = useState<Book[]>([]);
+  const [contBooks, setContBooks] = useState<Book[]>([]);
   useEffect(() => {
     (async () => {
       try {
         const res = await axiosInstance.get<ResponseType & { books?: Book[] }>(
-          "/book/get-1",
+          "/book/getBooksByUser",
           {
             withCredentials: true,
           }
@@ -27,6 +28,11 @@ const Dash = () => {
 
         if (res.data.status === "ok" && res.data.books) {
           setBooks(res.data.books);
+
+          const favBook = res.data.books.filter((book) => book.isFavourited);
+          const contBook = res.data.books.filter((book) => book.progress > 0);
+          setContBooks(contBook);
+          setFavBooks(favBook);
         }
       } catch {
         console.log("ERROR");
@@ -73,25 +79,6 @@ const Dash = () => {
       console.log("Disconnected from server");
     });
   }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await axiosInstance.get<ResponseType & { books: Book[] }>(
-          "/book/getFavourites"
-        );
-
-        if (res.data.status === "ok") {
-          setFavBooks(res.data.books);
-        } else {
-          console.log(res.data.message);
-        }
-      } catch {
-        console.error("failed to connected to server");
-      }
-    })();
-  }, []);
-
   const [show, setShow] = useState(false);
 
   return (
@@ -107,7 +94,7 @@ const Dash = () => {
             onClick={() => setShow((prev) => !prev)}
             className="flex justify-center items-center relative lg:w-[50px] lg:h-[50px] w-[30px] h-[30px] rounded-full bg-slate-900 z-[100] cursor-pointer"
           >
-            <X size={32} />
+            <X />
           </div>
         </div>
         <div className="flex flex-col gap-10 lg:mt-5">
@@ -116,7 +103,7 @@ const Dash = () => {
               Continue Reading
             </div>
             <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
-              {books.map((book) => (
+              {contBooks.map((book) => (
                 <BookHolder
                   key={book.id}
                   id={book.id}
@@ -130,7 +117,7 @@ const Dash = () => {
           </div>
           <div>
             <div className="text-md mb-2 font-semibold">Favourite</div>
-            <div className="flex gap-5 overflow-x-auto no-scrollbar">
+            <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
               {favBooks.map((book) => (
                 <BookHolder
                   key={book.id}
@@ -143,9 +130,20 @@ const Dash = () => {
               ))}
             </div>
           </div>
-          <div>
+          <div className="pb-5">
             <div className="text-md mb-2 font-semibold">All Book</div>
-            <div className="flex gap-5 overflow-x-auto no-scrollbar"></div>
+            <div className="flex flex-wrap gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
+              {books.map((book) => (
+                <BookHolder
+                  key={book.id}
+                  id={book.id}
+                  author={book.author}
+                  cover={book.coverURL}
+                  name={book.name}
+                  progress={book.progress}
+                />
+              ))}
+            </div>
           </div>
           <div
             onClick={() => {

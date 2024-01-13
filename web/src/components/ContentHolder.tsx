@@ -1,6 +1,12 @@
-import { X } from "@phosphor-icons/react";
+import { Terminal, X } from "@phosphor-icons/react";
 import React from "react";
 import { ViewerRef } from "react-epub-viewer";
+
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "../../@/components/ui/alert";
 
 export interface Toc {
   label: string;
@@ -31,6 +37,7 @@ const ContentHolder: React.FC<Props> = ({ toc, setShow, show, viewerRef }) => {
       >
         <X className="text-2xl" />
       </div>
+
       <div className="flex flex-col gap-2 py-5 overflow-x-hidden">
         {toc &&
           toc.map((toc, i) => (

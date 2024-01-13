@@ -1,5 +1,12 @@
-import { Gear, Heart, List, Moon, Sun } from "@phosphor-icons/react";
-import React, { useEffect, useState } from "react";
+import {
+  FloppyDiskBack,
+  Gear,
+  Heart,
+  List,
+  Moon,
+  Sun,
+} from "@phosphor-icons/react";
+import React, { useState } from "react";
 import { isDark } from "../utils/darkOrLight";
 import axiosInstance from "../axiosInstant";
 import { useParams } from "react-router-dom";
@@ -75,7 +82,7 @@ const ReaderNav: React.FC<Props> = ({
           showNav ? "reader-nav-active" : ""
         } reader-nav fixed bottom-0 w-full h-[60px] dark:bg-[rgba(11,14,32,0.46)] bg-[rgba(255,222,203,0.63)]`}
       >
-        <div className={`text-[40px] flex justify-around items-center h-full`}>
+        <div className={`text-[25px] flex justify-around items-center h-full`}>
           <Heart
             onClick={isFav ? handleRemoveFavouriteBook : handleFavouriteBook}
             weight={isFav ? "fill" : "regular"}
@@ -91,6 +98,7 @@ const ReaderNav: React.FC<Props> = ({
             className="cursor-pointer"
           />
           <Gear />
+          <FloppyDiskBack />
         </div>
       </div>
       <div
@@ -115,6 +123,7 @@ const ReaderNav: React.FC<Props> = ({
             className="cursor-pointer"
           />
           <Gear className="cursor-pointer" />
+          <FloppyDiskBack />
         </div>
       </div>
     </>
