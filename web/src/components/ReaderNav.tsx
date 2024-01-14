@@ -1,16 +1,10 @@
-import {
-  FloppyDiskBack,
-  Gear,
-  Heart,
-  List,
-  Moon,
-  Sun,
-} from "@phosphor-icons/react";
+import { Gear, Heart, List, Moon, Sun } from "@phosphor-icons/react";
 import React, { useState } from "react";
 import { isDark } from "../utils/darkOrLight";
 import axiosInstance from "../axiosInstant";
 import { useParams } from "react-router-dom";
 import { ResponseType } from "../types/global";
+import { toast } from "sonner";
 
 interface Props {
   themeSwitchCleanup: () => void;
@@ -45,13 +39,19 @@ const ReaderNav: React.FC<Props> = ({
         bookId,
       });
       if (res.data.status === "ok") {
-        console.log(res.data.message);
+        toast(res.data.message, { position: "top-right" });
         setIsFav(true);
       } else {
-        console.error(res.data.message);
+        toast(res.data.message, {
+          position: "top-right",
+          style: { color: "red" },
+        });
       }
     } catch {
-      console.log("failed to connect to server");
+      toast("failed to connect to server", {
+        position: "top-right",
+        style: { color: "red" },
+      });
     }
   };
 
@@ -64,13 +64,19 @@ const ReaderNav: React.FC<Props> = ({
         }
       );
       if (res.data.status === "ok") {
-        console.log(res.data.message);
+        toast(res.data.message, { position: "top-right" });
         setIsFav(false);
       } else {
-        console.error(res.data.message);
+        toast(res.data.message, {
+          position: "top-right",
+          style: { color: "red" },
+        });
       }
     } catch {
-      console.log("failed to connect to server");
+      toast("failed to connect to server", {
+        position: "top-right",
+        style: { color: "red" },
+      });
     }
   };
 
@@ -98,7 +104,6 @@ const ReaderNav: React.FC<Props> = ({
             className="cursor-pointer"
           />
           <Gear />
-          <FloppyDiskBack />
         </div>
       </div>
       <div
@@ -123,7 +128,6 @@ const ReaderNav: React.FC<Props> = ({
             className="cursor-pointer"
           />
           <Gear className="cursor-pointer" />
-          <FloppyDiskBack />
         </div>
       </div>
     </>

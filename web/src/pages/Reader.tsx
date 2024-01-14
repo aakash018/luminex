@@ -17,6 +17,9 @@ import ProtectedRoutes from "../components/shared/ProtectedRoutes";
 import { getReadingLocations, setReadingLocation } from "../readingLocation";
 import ReaderNav from "../components/ReaderNav";
 import ContentHolder, { Toc } from "../components/ContentHolder";
+import { CircleNotch } from "@phosphor-icons/react";
+
+import ReaderSettings from "@/components/ReaderSettings";
 
 // import { socket } from "./Dash";
 
@@ -57,7 +60,7 @@ function Reader() {
   const viewerRef = useRef<ViewerRef>(null);
 
   const [bookLoading, setBookLoading] = useState(true);
-  const [isFavourite, setIsFavourite] = useState<boolean>(false);
+  const [isFavourite, setIsFavourite] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -123,6 +126,7 @@ function Reader() {
           resizeOnOrientationChange: true,
           spread: "none",
         }}
+        loadingView={<></>}
         onTocChange={(e) => {
           toc.current = e;
           // setRenderToc((prev) => !prev);
@@ -155,6 +159,17 @@ function Reader() {
 
   return (
     <ProtectedRoutes>
+      {bookLoading && (
+        <div className="text-white flex justify-center items-center gap-3 absolute top-0 left-0 w-[100vw] h-[100vh] bg-[rgba(0,0,0,0.69)] z-[10] ">
+          <CircleNotch size={32} className="animate-spin" />
+          <div className="text-3xl ">Loading</div>
+        </div>
+      )}
+      {false && (
+        <div className="flex justify-center items-center gap-3 absolute top-0 left-0 w-[100vw] h-[100vh] bg-[rgba(0,0,0,0.69)] z-[10]">
+          <ReaderSettings />
+        </div>
+      )}
       <ContentHolder
         toc={toc.current}
         setShow={setShowContentMenu}

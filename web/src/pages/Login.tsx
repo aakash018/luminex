@@ -12,13 +12,16 @@ import { useUser } from "../context/User";
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState({
+    display: false,
+    message: "",
+  });
   const { setUser } = useUser();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     setAccessToken("");
-    console.log(getAccessToken());
   }, []);
 
   const handleSubmit = async () => {
@@ -28,7 +31,10 @@ const Login: React.FC = () => {
     };
 
     if (username.trim() === "" || password.trim() === "")
-      return alert("empty fields");
+      return setError({
+        display: true,
+        message: "empty fields",
+      });
     try {
       const res = await axios.post<
         ResponseType & { user?: User; accessToken: string }
@@ -37,15 +43,20 @@ const Login: React.FC = () => {
       });
 
       if (res.data.status === "fail" || !res.data.user) {
-        return console.log(res.data);
+        return setError({
+          display: true,
+          message: res.data.message,
+        });
       } else {
         setAccessToken(res.data.accessToken);
         setUser(res.data.user);
         navigate("/");
       }
     } catch (e) {
-      console.log(e);
-      alert("internal server error");
+      setError({
+        display: true,
+        message: "internal server error",
+      });
     }
   };
 
@@ -55,6 +66,11 @@ const Login: React.FC = () => {
         <h1 className="text-5xl font-sacramento">luminex</h1>
         {/* <h2 className="text-xl">YOUR READING HUB</h2> */}
         <div className="mt-20 flex flex-col gap-10 w-full">
+          {error.display && (
+            <div className="text-theme-default-error font-semibold">
+              {error.message}
+            </div>
+          )}
           <Input label={"Username"} setValue={setUsername} value={username} />
           <Input
             label={"Password"}

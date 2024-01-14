@@ -193,7 +193,7 @@ router.post("/removeFavourite", validateUser, async (req, res) => {
     });
     res.json({
       status: "ok",
-      message: "book added to favourite",
+      message: "book removed from favourite",
     });
   } catch {
     res.json({
@@ -220,6 +220,33 @@ router.get("/getFavourites", validateUser, async (req, res) => {
     res.json({
       status: "fail",
       message: "failed to find favourite books",
+    });
+  }
+});
+
+router.get("/search", validateUser, async (req, res) => {
+  const { searchTerm } = req.query as { searchTerm: string };
+
+  try {
+    const books = await prisma.book.findMany({
+      where: {
+        userId: req.decoded?.userId,
+        name: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+    });
+
+    res.json({
+      status: "ok",
+      message: "books found",
+      books,
+    });
+  } catch (e) {
+    res.json({
+      status: "fail",
+      message: "failed to retrieve books",
     });
   }
 });

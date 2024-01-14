@@ -23,6 +23,8 @@ export default {
         "theme-light-bg": "#FDF7E4",
         "theme-light-prm": "#BBAB8C",
         "theme-light-pop": "#b59557",
+        "theme-default-error": "#D70040",
+        "theme-default-success": "#6FF18B",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

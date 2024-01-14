@@ -1,12 +1,6 @@
-import { Terminal, X } from "@phosphor-icons/react";
+import { X } from "@phosphor-icons/react";
 import React from "react";
 import { ViewerRef } from "react-epub-viewer";
-
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "../../@/components/ui/alert";
 
 export interface Toc {
   label: string;
@@ -46,7 +40,7 @@ const ContentHolder: React.FC<Props> = ({ toc, setShow, show, viewerRef }) => {
               key={i}
               onClick={() => {
                 viewerRef.current?.setLocation(toc.href);
-                // setShow(false);
+                setShow(false);
               }}
             >
               {toc.label}

@@ -1,21 +1,29 @@
-import { Plus, X } from "@phosphor-icons/react";
+import { Plus, User, WarningCircle, X } from "@phosphor-icons/react";
 import BookHolder from "../components/shared/BookHolder";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
 import SearchBar from "../components/shared/SearchBar";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../axiosInstant";
 import { Book, ResponseType } from "../types/global";
+import { toast } from "sonner";
 
 import socket from "../socket";
 import { clearReadingLocation, getReadingLocations } from "../readingLocation";
-import Settings from "../components/Settings";
+
+export const isDark = () => {
+  return document.documentElement.classList.contains("dark");
+};
 
 const Dash = () => {
   const nav = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [favBooks, setFavBooks] = useState<Book[]>([]);
   const [contBooks, setContBooks] = useState<Book[]>([]);
+
+  const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
+  const [isSearchEmpty, setIsSearchEmpty] = useState(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -40,7 +48,21 @@ const Dash = () => {
     })();
   }, []);
 
+  const handleLightDarkSwitch = () => {
+    if (document.documentElement.classList.contains("dark")) {
+      document.documentElement.classList.remove("dark");
+      setTheme("Light");
+    } else {
+      document.documentElement.classList.add("dark");
+      setTheme("Dark");
+    }
+    setShowMenu(false);
+  };
+
+  const initialized = useRef(false);
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
     (async () => {
       const readingLoc = getReadingLocations();
 
@@ -59,12 +81,21 @@ const Dash = () => {
           clearReadingLocation();
 
           if (res.data.status === "ok") {
-            console.log(res.data.message);
+            toast(res.data.message, {
+              style: { color: "green" },
+              position: "top-right",
+            });
           } else {
-            console.log(res.data.message);
+            toast(res.data.message, {
+              style: { color: "red" },
+              position: "top-right",
+            });
           }
         } catch (e) {
-          console.log(e);
+          toast("error saving last progress", {
+            style: { color: "red" },
+            position: "top-right",
+          });
         }
       }
     })();
@@ -79,81 +110,141 @@ const Dash = () => {
       console.log("Disconnected from server");
     });
   }, []);
-  const [show, setShow] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [theme, setTheme] = useState<"Dark" | "Light">(
+    isDark() ? "Dark" : "Light"
+  );
 
   return (
     <ProtectedRoutes>
-      <Settings show={show} />
+      {/* <Settings show={show} /> */}
       <div className="lg:px-[150px] px-5">
-        <div className=" py-5 flex gap-5 items-center justify-between">
+        <div className=" py-5 flex gap-5 items-center justify-between relative">
           <h1 className="font-sacramento lg:text-3xl text-2xl">luminex</h1>
           <div className="lg:m-auto">
-            <SearchBar />
-          </div>
-          <div
-            onClick={() => setShow((prev) => !prev)}
-            className="flex justify-center items-center relative lg:w-[50px] lg:h-[50px] w-[30px] h-[30px] rounded-full bg-slate-900 z-[100] cursor-pointer"
-          >
-            <X />
-          </div>
-        </div>
-        <div className="flex flex-col gap-10 lg:mt-5">
-          <div>
-            <div className="text-md mb-2 font-semibold lg:mb-3">
-              Continue Reading
-            </div>
-            <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
-              {contBooks.map((book) => (
-                <BookHolder
-                  key={book.id}
-                  id={book.id}
-                  author={book.author}
-                  cover={book.coverURL}
-                  name={book.name}
-                  progress={book.progress}
-                />
-              ))}
-            </div>
+            <SearchBar
+              setBooks={setSearchedBooks}
+              setIsEmpty={setIsSearchEmpty}
+            />
           </div>
           <div>
-            <div className="text-md mb-2 font-semibold">Favourite</div>
-            <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
-              {favBooks.map((book) => (
-                <BookHolder
-                  key={book.id}
-                  id={book.id}
-                  author={book.author}
-                  cover={book.coverURL}
-                  name={book.name}
-                  progress={book.progress}
-                />
-              ))}
+            <User
+              className="text-xl lg:text-2xl cursor-pointer "
+              onClick={() => setShowMenu((prev) => !prev)}
+            />
+            <div
+              className={`profile-setting ${
+                showMenu ? "profile-setting-active" : ""
+              } absolute z-[3] right-0 dark:bg-[#0b1720] bg-theme-light-prm rounded-sm mt-2`}
+            >
+              <ul>
+                <li className="px-10 py-3 text-center cursor-pointer">
+                  Profile
+                </li>
+                <li
+                  className="px-10 py-3 cursor-pointer"
+                  onClick={handleLightDarkSwitch}
+                >
+                  Theme: {theme}
+                </li>
+              </ul>
             </div>
-          </div>
-          <div className="pb-5">
-            <div className="text-md mb-2 font-semibold">All Book</div>
-            <div className="flex flex-wrap gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
-              {books.map((book) => (
-                <BookHolder
-                  key={book.id}
-                  id={book.id}
-                  author={book.author}
-                  cover={book.coverURL}
-                  name={book.name}
-                  progress={book.progress}
-                />
-              ))}
-            </div>
-          </div>
-          <div
-            onClick={() => {
-              nav("/add");
-            }}
-            className="fixed bottom-5 right-5 dark:bg-theme-dark-prm bg-theme-light-pop w-[70px] h-[70px] rounded-full flex justify-center items-center"
-          >
-            <Plus size={25} />
           </div>
         </div>
+
+        {searchedBooks.length !== 0 && !isSearchEmpty && (
+          <div className="mt-10">
+            <div className="text-md mb-5 font-semibold lg:mb-3">
+              Searched Books
+            </div>
+            <div className="flex gap-5 lg:gap-10 flex-wrap no-scrollbar justify-center lg:justify-start">
+              {searchedBooks.map((book) => (
+                <BookHolder
+                  key={book.id}
+                  id={book.id}
+                  author={book.author}
+                  cover={book.coverURL}
+                  name={book.name}
+                  progress={book.progress}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {searchedBooks.length === 0 && isSearchEmpty && (
+          <div className="mt-10">
+            <div className="text-md mb-5 font-semibold lg:mb-3">
+              Searched Books
+            </div>
+            <div className="w-full h-[200px] flex justify-center items-center">
+              <div className="flex flex-col items-center gap-3">
+                <WarningCircle size={32} />
+                <div>No results found</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {searchedBooks.length === 0 && !isSearchEmpty && (
+          <div className="flex flex-col gap-10 lg:mt-5">
+            <div>
+              <div className="text-md mb-2 font-semibold lg:mb-3">
+                Continue Reading
+              </div>
+              <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
+                {contBooks.map((book) => (
+                  <BookHolder
+                    key={book.id}
+                    id={book.id}
+                    author={book.author}
+                    cover={book.coverURL}
+                    name={book.name}
+                    progress={book.progress}
+                  />
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-md mb-2 font-semibold">Favourite</div>
+              <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
+                {favBooks.map((book) => (
+                  <BookHolder
+                    key={book.id}
+                    id={book.id}
+                    author={book.author}
+                    cover={book.coverURL}
+                    name={book.name}
+                    progress={book.progress}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="pb-5">
+              <div className="text-md mb-2 font-semibold">All Book</div>
+              <div className="flex flex-wrap gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
+                {books.map((book) => (
+                  <BookHolder
+                    key={book.id}
+                    id={book.id}
+                    author={book.author}
+                    cover={book.coverURL}
+                    name={book.name}
+                    progress={book.progress}
+                  />
+                ))}
+              </div>
+            </div>
+            <div
+              onClick={() => {
+                nav("/add");
+              }}
+              className="fixed bottom-5 right-5 dark:bg-theme-dark-prm bg-theme-light-pop w-[70px] h-[70px] rounded-full flex justify-center items-center"
+            >
+              <Plus size={25} />
+            </div>
+          </div>
+        )}
       </div>
     </ProtectedRoutes>
   );
