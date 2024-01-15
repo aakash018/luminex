@@ -5,19 +5,21 @@ import SearchBar from "../components/shared/SearchBar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../axiosInstant";
-import { Book, ResponseType } from "../types/global";
+import { Book, ResponseType, User as UserType } from "../types/global";
 import { toast } from "sonner";
 
 import socket from "../socket";
 import { clearReadingLocation, getReadingLocations } from "../readingLocation";
 import { setAccessToken } from "@/accessToken";
 import axios from "axios";
+import { useUser } from "@/context/User";
 
 export const isDark = () => {
   return document.documentElement.classList.contains("dark");
 };
 
 const Dash = () => {
+  const { user, setUser } = useUser();
   const nav = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [favBooks, setFavBooks] = useState<Book[]>([]);
@@ -50,7 +52,7 @@ const Dash = () => {
     })();
   }, []);
 
-  const handleLightDarkSwitch = () => {
+  const handleLightDarkSwitch = async () => {
     const payload = {
       theme: "",
     };
@@ -63,10 +65,31 @@ const Dash = () => {
       setTheme("Dark");
       payload.theme = "dark";
     }
-    axiosInstance.get("/user/setTheme", {
-      withCredentials: true,
-      params: payload,
-    });
+
+    try {
+      const res = await axiosInstance.get<ResponseType & { user: UserType }>(
+        "/user/setTheme",
+        {
+          withCredentials: true,
+          params: payload,
+        }
+      );
+
+      if (res.data.status === "ok") {
+        setUser(res.data.user);
+      } else {
+        toast("failed to update theme", {
+          position: "top-right",
+          style: { color: "red" },
+        });
+      }
+    } catch {
+      toast("failed to connect to server", {
+        position: "top-right",
+        style: { color: "red" },
+      });
+    }
+
     setShowMenu(false);
   };
 
@@ -121,6 +144,20 @@ const Dash = () => {
       console.log("Disconnected from server");
     });
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      console.log(user);
+      if (user.theme === "light") {
+        document.documentElement.classList.remove("dark");
+        setTheme("Light");
+      } else if (!document.documentElement.classList.contains("dark")) {
+        document.documentElement.classList.add("dark");
+        setTheme("Dark");
+      }
+    }
+  }, [user]);
+
   const [showMenu, setShowMenu] = useState(false);
   const [theme, setTheme] = useState<"Dark" | "Light">(
     isDark() ? "Dark" : "Light"
@@ -230,6 +267,15 @@ const Dash = () => {
                 Continue Reading
               </div>
               <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
+                {contBooks.length === 0 && (
+                  <div className="w-full h-[150px] flex justify-center items-center flex-col gap-2">
+                    <div>
+                      <WarningCircle />
+                    </div>
+
+                    <div>No Books</div>
+                  </div>
+                )}
                 {contBooks.map((book) => (
                   <BookHolder
                     key={book.id}
@@ -245,6 +291,16 @@ const Dash = () => {
             <div>
               <div className="text-md mb-2 font-semibold">Favourite</div>
               <div className="flex gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
+                {favBooks.length === 0 && (
+                  <div className="w-full h-[150px] flex justify-center items-center flex-col gap-2">
+                    <div>
+                      <WarningCircle />
+                    </div>
+
+                    <div>No Books</div>
+                  </div>
+                )}
+
                 {favBooks.map((book) => (
                   <BookHolder
                     key={book.id}
@@ -261,6 +317,15 @@ const Dash = () => {
               <div className="text-md mb-2 font-semibold">All Book</div>
               <div className="flex justify-center w-full md:justify-start  ">
                 <div className="w-[330px] md:w-full flex flex-wrap gap-5 lg:gap-10 overflow-x-auto no-scrollbar ">
+                  {books.length === 0 && (
+                    <div className="w-full h-[150px] flex justify-center items-center flex-col gap-2">
+                      <div>
+                        <WarningCircle />
+                      </div>
+                      <div>No Books</div>
+                    </div>
+                  )}
+
                   {books.map((book) => (
                     <BookHolder
                       key={book.id}

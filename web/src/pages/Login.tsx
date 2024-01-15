@@ -12,6 +12,7 @@ import { useUser } from "../context/User";
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState({
     display: false,
     message: "",
@@ -36,6 +37,7 @@ const Login: React.FC = () => {
         message: "empty fields",
       });
     try {
+      setLoading(true);
       const res = await axios.post<
         ResponseType & { user?: User; accessToken: string }
       >(`${import.meta.env.VITE_SERVER_ENDPOINT}/auth/login`, payload, {
@@ -43,6 +45,7 @@ const Login: React.FC = () => {
       });
 
       if (res.data.status === "fail" || !res.data.user) {
+        setLoading(false);
         return setError({
           display: true,
           message: res.data.message,
@@ -53,6 +56,7 @@ const Login: React.FC = () => {
         navigate("/");
       }
     } catch (e) {
+      setLoading(false);
       setError({
         display: true,
         message: "internal server error",
@@ -78,7 +82,7 @@ const Login: React.FC = () => {
             setValue={setPassword}
             value={password}
           />
-          <Button label="LOGIN" onClick={handleSubmit} />
+          <Button label="LOGIN" onClick={handleSubmit} disabled={loading} />
           <h2 className="text-center">
             Don't have an account? <Link to={"/signup"}>SignUp</Link>{" "}
           </h2>

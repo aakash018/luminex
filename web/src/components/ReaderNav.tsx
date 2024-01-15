@@ -3,8 +3,9 @@ import React, { useState } from "react";
 import { isDark } from "../utils/darkOrLight";
 import axiosInstance from "../axiosInstant";
 import { useParams } from "react-router-dom";
-import { ResponseType } from "../types/global";
+import { ResponseType, User } from "../types/global";
 import { toast } from "sonner";
+import { useUser } from "@/context/User";
 
 interface Props {
   themeSwitchCleanup: () => void;
@@ -21,13 +22,44 @@ const ReaderNav: React.FC<Props> = ({
   isFav,
   setIsFav,
 }) => {
+  const { setUser } = useUser();
   const [isThemeDark, setIsThemeDark] = useState(isDark());
   const { bookId } = useParams();
-  const switchNightDark = () => {
+  const switchNightDark = async () => {
+    const payload = {
+      theme: "",
+    };
     if (document.documentElement.classList.contains("dark")) {
       document.documentElement.classList.remove("dark");
+
+      payload.theme = "light";
     } else {
       document.documentElement.classList.add("dark");
+
+      payload.theme = "dark";
+    }
+    try {
+      const res = await axiosInstance.get<ResponseType & { user: User }>(
+        "/user/setTheme",
+        {
+          withCredentials: true,
+          params: payload,
+        }
+      );
+
+      if (res.data.status === "ok") {
+        setUser(res.data.user);
+      } else {
+        toast("failed to update theme", {
+          position: "top-right",
+          style: { color: "red" },
+        });
+      }
+    } catch {
+      toast("failed to connect to server", {
+        position: "top-right",
+        style: { color: "red" },
+      });
     }
     setIsThemeDark(isDark());
     themeSwitchCleanup();

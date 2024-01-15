@@ -85,6 +85,16 @@ function Reader() {
   }, []);
 
   useEffect(() => {
+    if (user) {
+      if (user.theme === "light") {
+        document.documentElement.classList.remove("dark");
+      } else if (!document.documentElement.classList.contains("dark")) {
+        document.documentElement.classList.add("dark");
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
     const checkForElement = () => {
       console.log("HERE");
       const targetElement = document.querySelectorAll("iframe");

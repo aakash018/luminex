@@ -9,6 +9,7 @@ export interface User {
   name: string;
   id: string;
   books: Book[];
+  theme: "dark" | "light";
 }
 
 export interface Book {

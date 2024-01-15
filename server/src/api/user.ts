@@ -8,7 +8,7 @@ router.get("/setTheme", validateUser, async (req, res) => {
   const { theme } = req.query as { theme: "dark" | "light" };
 
   try {
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: {
         id: req.decoded?.userId,
       },
@@ -20,6 +20,7 @@ router.get("/setTheme", validateUser, async (req, res) => {
     res.json({
       status: "ok",
       message: "theme updated",
+      user,
     });
   } catch {
     res.json({
