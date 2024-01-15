@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../server";
 import bcrypt from "bcrypt";
 import { createAccessToken, createRefreshToken } from "../tokenCreate";
+import { validateUser } from "../middleware/validateUser";
 
 const router = express.Router();
 
@@ -180,6 +181,14 @@ router.get("/refresh-token-with-user", async (req, res) => {
       message: "bad refresh token",
     });
   }
+});
+
+router.get("/logout", validateUser, (_, res) => {
+  res.clearCookie("rid");
+  res.json({
+    status: "ok",
+    message: "cookie deleted",
+  });
 });
 
 export default router;

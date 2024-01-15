@@ -94,8 +94,8 @@ function Reader() {
           viewerRef.current.setLocation(book?.location);
           setReadingLocation(book.location, book.id, book.progress);
           console.log(getReadingLocations());
-          setBookLoading(false);
         }
+        setBookLoading(false);
       } else {
         // If the element isn't found, set a timeout and keep checking
         setTimeout(checkForElement, 1500); // Adjust the timeout as needed

@@ -1,4 +1,4 @@
-import { Plus, User, WarningCircle, X } from "@phosphor-icons/react";
+import { Plus, User, WarningCircle } from "@phosphor-icons/react";
 import BookHolder from "../components/shared/BookHolder";
 import ProtectedRoutes from "../components/shared/ProtectedRoutes";
 import SearchBar from "../components/shared/SearchBar";
@@ -10,6 +10,8 @@ import { toast } from "sonner";
 
 import socket from "../socket";
 import { clearReadingLocation, getReadingLocations } from "../readingLocation";
+import { setAccessToken } from "@/accessToken";
+import axios from "axios";
 
 export const isDark = () => {
   return document.documentElement.classList.contains("dark");
@@ -49,13 +51,22 @@ const Dash = () => {
   }, []);
 
   const handleLightDarkSwitch = () => {
+    const payload = {
+      theme: "",
+    };
     if (document.documentElement.classList.contains("dark")) {
       document.documentElement.classList.remove("dark");
       setTheme("Light");
+      payload.theme = "light";
     } else {
       document.documentElement.classList.add("dark");
       setTheme("Dark");
+      payload.theme = "dark";
     }
+    axiosInstance.get("/user/setTheme", {
+      withCredentials: true,
+      params: payload,
+    });
     setShowMenu(false);
   };
 
@@ -115,6 +126,26 @@ const Dash = () => {
     isDark() ? "Dark" : "Light"
   );
 
+  const handleLogout = async () => {
+    try {
+      const res = await axiosInstance.get<ResponseType>("/auth/logout", {
+        withCredentials: true,
+      });
+
+      if (res.data.status === "ok") {
+        setAccessToken("");
+        nav("/login");
+      } else {
+        toast("failed to logout", { position: "top-right" });
+      }
+    } catch {
+      toast("failed to connect to servers", {
+        position: "top-right",
+        style: { color: "red " },
+      });
+    }
+  };
+
   return (
     <ProtectedRoutes>
       {/* <Settings show={show} /> */}
@@ -146,6 +177,12 @@ const Dash = () => {
                   onClick={handleLightDarkSwitch}
                 >
                   Theme: {theme}
+                </li>
+                <li
+                  className="px-10 py-3 cursor-pointer text-center text-theme-default-error"
+                  onClick={handleLogout}
+                >
+                  Logout
                 </li>
               </ul>
             </div>
@@ -222,17 +259,19 @@ const Dash = () => {
             </div>
             <div className="pb-5">
               <div className="text-md mb-2 font-semibold">All Book</div>
-              <div className="flex flex-wrap gap-5 lg:gap-10 overflow-x-auto no-scrollbar">
-                {books.map((book) => (
-                  <BookHolder
-                    key={book.id}
-                    id={book.id}
-                    author={book.author}
-                    cover={book.coverURL}
-                    name={book.name}
-                    progress={book.progress}
-                  />
-                ))}
+              <div className="flex justify-center w-full md:justify-start  ">
+                <div className="w-[330px] md:w-full flex flex-wrap gap-5 lg:gap-10 overflow-x-auto no-scrollbar ">
+                  {books.map((book) => (
+                    <BookHolder
+                      key={book.id}
+                      id={book.id}
+                      author={book.author}
+                      cover={book.coverURL}
+                      name={book.name}
+                      progress={book.progress}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
             <div

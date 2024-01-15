@@ -14,17 +14,23 @@ model User {
   name     String @db.VarChar(255)
   email    String @unique
   books    Book[]
+  theme    Theme  @default(dark)
 }
 
 model Book {
   id           String  @id @default(cuid())
   name         String
   author       String
-  progress     Int     @default(0)
+  progress     Float   @default(0.0)
   location     String?
   coverURL     String
   bookURL      String
   user         User    @relation(fields: [userId], references: [id])
   userId       String
   isFavourited Boolean @default(false)
+}
+
+enum Theme {
+  dark
+  light
 }

@@ -22,6 +22,7 @@ export default {
         "theme-dark-prm": "#F71735",
         "theme-light-bg": "#FDF7E4",
         "theme-light-prm": "#BBAB8C",
+        "theme-light-prm-light": "#f7e9cd",
         "theme-light-pop": "#b59557",
         "theme-default-error": "#D70040",
         "theme-default-success": "#6FF18B",

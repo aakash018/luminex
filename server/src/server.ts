@@ -5,6 +5,7 @@ import cors from "cors";
 import auth from "./api/auth";
 import { validateUser } from "./middleware/validateUser";
 import book from "./api/book";
+import user from "./api/user";
 
 import http from "http";
 import { Server } from "socket.io";
@@ -77,6 +78,7 @@ app.use(express.urlencoded());
 
 app.use("/auth", auth);
 app.use("/book", book);
+app.use("/user", user);
 
 app.get("/", validateUser, (_, res) => {
   console.log("SERVER RUNNING");
