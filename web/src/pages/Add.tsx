@@ -15,6 +15,7 @@ const Add = () => {
   const [author, setAuthor] = useState("");
   const [bookPdf, setBookPdf] = useState<File | null>(null);
   const [cover, setCover] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const imgUploaderRef = useRef<HTMLInputElement>(null);
   const epubUploaderRef = useRef<HTMLInputElement>(null);
@@ -55,9 +56,8 @@ const Add = () => {
     formData.append("cover", cover);
     formData.append("totalPages", "322");
 
-    console.log(formData);
-
     try {
+      setLoading(true);
       const response = await axiosInstance.post<ResponseType>(
         "/book/upload",
         formData,
@@ -68,6 +68,7 @@ const Add = () => {
           withCredentials: true,
         }
       );
+      setLoading(false);
       if (response.data.status === "ok") {
         toast(response.data.message, {
           position: "top-center",
@@ -81,6 +82,8 @@ const Add = () => {
         });
       }
     } catch (error) {
+      setLoading(false);
+
       setError({
         display: true,
         message: "server error while uploading file",
@@ -151,7 +154,7 @@ const Add = () => {
                 }
               }}
             />
-            <Button onClick={handlelSubmit} label="Submit" />
+            <Button onClick={handlelSubmit} label="Submit" disabled={loading} />
           </div>
         </div>
       </div>
