@@ -20,7 +20,7 @@ const PORT = 5000;
 export const prisma = new PrismaClient();
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: process.env.CLIENT_ENDPOINT,
   optionsSuccessStatus: 200,
   credentials: true,
 };

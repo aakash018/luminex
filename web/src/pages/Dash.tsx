@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import socket from "../socket";
 import { clearReadingLocation, getReadingLocations } from "../readingLocation";
 import { setAccessToken } from "@/accessToken";
-import axios from "axios";
+
 import { useUser } from "@/context/User";
 
 export const isDark = () => {
