@@ -6,7 +6,7 @@ import HomeTheme from "../components/HomeTheme";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ResponseType, User } from "../types/global";
-import { getAccessToken, setAccessToken } from "../accessToken";
+import { setAccessToken } from "../accessToken";
 import { useUser } from "../context/User";
 
 const Login: React.FC = () => {
