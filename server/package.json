@@ -7,7 +7,7 @@
     "wch": "tsc -w",
     "dev": "nodemon -r dotenv/config ./dist/server.js",
     "start": "node -r dotenv/config ./dist/server.js",
-    "build": "tsc"
+    "build": "pnpm install && tsc && npx prisma migrate dev --name final"
   },
   "keywords": [],
   "author": "",
