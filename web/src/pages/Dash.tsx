@@ -147,7 +147,6 @@ const Dash = () => {
 
   useEffect(() => {
     if (user) {
-      console.log(user);
       if (user.theme === "light") {
         document.documentElement.classList.remove("dark");
         setTheme("Light");

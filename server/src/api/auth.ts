@@ -90,7 +90,9 @@ router.post("/login", async (req, res) => {
     const refreshToken = createRefreshToken(user);
     res.cookie("rid", refreshToken, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: "none",
+      secure: true,
     });
 
     return res.json({
