@@ -7,7 +7,7 @@
     "wch": "tsc -w",
     "dev": "nodemon -r dotenv/config ./dist/server.js",
     "start": "node -r dotenv/config ./dist/server.js",
-    "build": "pnpm install --no-frozen-lockfile && tsc && npx prisma migrate dev --name final"
+    "build": "pnpm install --no-frozen-lockfile && tsc && cd src && npx prisma migrate dev --name final"
   },
   "keywords": [],
   "author": "",
