@@ -15,7 +15,7 @@ import {
 } from "./utils/userReadingLocation";
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT;
 
 export const prisma = new PrismaClient();
 
